@@ -6,6 +6,7 @@ CREATE TABLE tasks (
     due_date TIMESTAMP NOT NULL,
     user_id INTEGER NOT NULL,
     created_at TIMESTAMP NOT NULL,
+    
     FOREIGN KEY (user_id)
         REFERENCES users(id)
         ON DELETE CASCADE
