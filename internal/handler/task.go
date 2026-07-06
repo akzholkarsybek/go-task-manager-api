@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Akakazkz/go-task-manager-api/internal/middleware"
 	"github.com/Akakazkz/go-task-manager-api/internal/model"
 	"github.com/Akakazkz/go-task-manager-api/internal/service"
 )
@@ -55,6 +56,13 @@ func (h *taskHandler) Create(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid json", http.StatusBadRequest)
 		return
 	}
+	userID, ok := middleware.GetUserID(r.Context())
+	if !ok {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	task.UserID = userID
 
 	if err := h.service.Create(&task); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -70,7 +78,12 @@ func (h *taskHandler) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *taskHandler) ListByUserID(w http.ResponseWriter, r *http.Request) {
-	userID := int64(1)
+	userID, ok := middleware.GetUserID(r.Context())
+	if !ok {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+
 	tasks, err := h.service.ListByUserID(userID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -93,7 +106,11 @@ func (h *taskHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID := int64(1)
+	userID, ok := middleware.GetUserID(r.Context())
+	if !ok {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
 	task, err := h.service.GetByID(id, userID)
 
 	if err != nil {
@@ -123,7 +140,11 @@ func (h *taskHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID := int64(1)
+	userID, ok := middleware.GetUserID(r.Context())
+	if !ok {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
 	task.ID = id
 	task.UserID = userID
 
@@ -147,13 +168,16 @@ func (h *taskHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid task id", http.StatusBadRequest)
 		return
 	}
-	userID := int64(1)
+	userID, ok := middleware.GetUserID(r.Context())
+	if !ok {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
 
 	if err := h.service.Delete(id, userID); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusNoContent)
 
 }

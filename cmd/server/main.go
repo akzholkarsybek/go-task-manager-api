@@ -8,6 +8,7 @@ import (
 	_ "github.com/lib/pq"
 
 	"github.com/Akakazkz/go-task-manager-api/internal/handler"
+	"github.com/Akakazkz/go-task-manager-api/internal/middleware"
 	"github.com/Akakazkz/go-task-manager-api/internal/repository"
 	"github.com/Akakazkz/go-task-manager-api/internal/service"
 )
@@ -33,8 +34,8 @@ func main() {
 	mux.HandleFunc("/health", handler.Health)
 	mux.HandleFunc("/users", userHandler.Handle)
 	mux.HandleFunc("/login", userHandler.Login)
-	mux.HandleFunc("/tasks", taskHandler.Handle)
-	mux.HandleFunc("/tasks/", taskHandler.HandleByID)
+	mux.Handle("/tasks", middleware.Auth(http.HandlerFunc(taskHandler.Handle)))
+	mux.Handle("/tasks/", middleware.Auth(http.HandlerFunc(taskHandler.HandleByID)))
 
 	server := &http.Server{
 		Addr:    ":8080",
