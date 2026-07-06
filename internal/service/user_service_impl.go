@@ -6,6 +6,7 @@ import (
 
 	"github.com/Akakazkz/go-task-manager-api/internal/model"
 	"github.com/Akakazkz/go-task-manager-api/internal/repository"
+	"github.com/Akakazkz/go-task-manager-api/internal/auth"
 )
 
 type userService struct {
@@ -30,7 +31,7 @@ func (s *userService) Login(email, password string) (string, error) {
 		return "", ErrInvalidCredentials
 	}
 
-	token, err := generateJWT(user.ID, user.Role)
+	token, err := auth.GenerateJWT(user.ID, user.Role)
 	if err != nil {
 		return "", err
 	}

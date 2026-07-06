@@ -7,7 +7,7 @@ import (
 
 var jwtSecret = []byte("CHANGE_ME_SECRET")
 
-func generateJWT(userID int64, role string) (string, error) {
+func GenerateJWT(userID int64, role string) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": userID,
 		"role":    role,
