@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	db, err := sql.Open("postgres", "postgres://postgres:kaz.123kz@localhost:5432/taskdb?sslmode=disable")
+	db, err := sql.Open("postgres", "postgres://postgres:7642004@localhost:5432/taskdb?sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -24,11 +24,17 @@ func main() {
 	userService := service.NewUserService(userRepo)
 	userHandler := handler.NewUserHandler(userService)
 
+	taskRepo := repository.NewPostgresTaskRepository(db)
+	taskService := service.NewTaskService(taskRepo)
+	taskHandler := handler.NewTaskHandler(taskService)
+
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/health", handler.Health)
 	mux.HandleFunc("/users", userHandler.Handle)
 	mux.HandleFunc("/login", userHandler.Login)
+	mux.HandleFunc("/tasks", taskHandler.Handle)
+	mux.HandleFunc("/tasks/", taskHandler.HandleByID)
 
 	server := &http.Server{
 		Addr:    ":8080",
